@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,18 @@
 #define PLUGININFOWIDGET_H
 
 #include <QWidget>
+
 #include "../utils.h"
 
 namespace Ui {
 class PluginInfoWidget;
 }
 
-class PluginInfoWidget : public QWidget
-{
+class PluginInfoWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit PluginInfoWidget(QWidget *pParent=nullptr);
+    explicit PluginInfoWidget(QWidget *pParent = nullptr);
     ~PluginInfoWidget();
     void setData(Utils::MDATA *pMData);
 
@@ -41,4 +41,4 @@ private:
     Ui::PluginInfoWidget *ui;
 };
 
-#endif // PLUGININFOWIDGET_H
+#endif  // PLUGININFOWIDGET_H

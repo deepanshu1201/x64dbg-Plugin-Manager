@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,20 @@
 #ifndef DIALOGCREATEMODULE_H
 #define DIALOGCREATEMODULE_H
 
+#include <QDate>
 #include <QDialog>
 #include <QFileDialog>
-#include <QStandardPaths>
 #include <QSettings>
-#include <QDate>
-#include "dialogcreatemoduleprocess.h"
+#include <QStandardPaths>
+
 #include "../utils.h"
+#include "dialogcreatemoduleprocess.h"
 
 namespace Ui {
 class DialogCreateModule;
 }
 
-class DialogCreateModule : public QDialog
-{
+class DialogCreateModule : public QDialog {
     Q_OBJECT
 
 public:
@@ -65,4 +65,4 @@ private:
     Utils::MDATA mdata;
 };
 
-#endif // DIALOGCREATEMODULE_H
+#endif  // DIALOGCREATEMODULE_H

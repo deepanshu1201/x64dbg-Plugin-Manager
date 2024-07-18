@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,38 @@
 //
 #include "updategitprocess.h"
 
-UpdateGitProcess::UpdateGitProcess(QObject *pParent) : QObject(pParent)
+bool _sort_mdata(const Utils::MDATA &mdata1, const Utils::MDATA &mdata2)
 {
-    bIsStop=false;
-    currentStats={};
+    bool bResult = false;
+
+    if (mdata1.sName == "x64core") {
+        bResult = true;
+    } else if (mdata2.sName == "x64core") {
+        bResult = false;
+    } else {
+        bResult = (mdata2.sUpdated > mdata1.sUpdated);
+    }
+
+    return bResult;
 }
 
-void UpdateGitProcess::setData(QString sServerListFileName)
+UpdateGitProcess::UpdateGitProcess(QObject *pParent) : QObject(pParent)
 {
-    this->sServerListFileName=sServerListFileName;
+    bIsStop = false;
+    g_bInit = false;
+    currentStats = {};
+}
+
+void UpdateGitProcess::setData(QString sServerListFileName, QString sServerLastestListFileName, bool bInit)
+{
+    this->sServerListFileName = sServerListFileName;
+    this->sServerLastestListFileName = sServerLastestListFileName;
+    this->g_bInit = bInit;
 }
 
 void UpdateGitProcess::stop()
 {
-    bIsStop=true;
+    bIsStop = true;
 }
 
 Utils::STATS UpdateGitProcess::getCurrentStats()
@@ -46,91 +64,113 @@ void UpdateGitProcess::process()
     QElapsedTimer elapsedTimer;
     elapsedTimer.start();
 
-    bIsStop=false;
+    bIsStop = false;
 
-    QList<Utils::MDATA> listMData=Utils::getModulesFromJSONFile(sServerListFileName);
+    QList<Utils::MDATA> listMData = Utils::getModulesFromJSONFile(sServerLastestListFileName);
 
-    int nCount=listMData.count();
+    if (g_bInit) {  // The first core only
+        QList<Utils::MDATA> _listMData;
 
-    int nNumbersOfGithub=0;
+        if (listMData.count()) {
+            _listMData.append(listMData.at(0));
 
-    for(int i=0;i<nCount;i++)
-    {
-        if(listMData.at(i).sGithub!="")
-        {
+            listMData = _listMData;
+        }
+    } else {
+        if (XBinary::isFileExists(sServerListFileName)) {
+            QList<Utils::MDATA> _listMData = Utils::getModulesFromJSONFile(sServerListFileName);
+
+            int nCount = listMData.count();
+
+            for (int i = 0; i < nCount; i++) {
+                QString sName = listMData.at(i).sName;
+                Utils::MDATA mdata = Utils::getMDataByName(&_listMData, sName);
+
+                if (mdata.sUpdated != "") {
+                    listMData[i].sUpdated = mdata.sUpdated;
+                }
+            }
+        }
+    }
+
+    std::sort(listMData.begin(), listMData.end(), _sort_mdata);
+
+    int nCount = listMData.count();
+
+    int nNumbersOfGithub = 0;
+
+    for (int i = 0; i < nCount; i++) {
+        if (listMData.at(i).sGithub != "") {
             nNumbersOfGithub++;
         }
     }
 
-    currentStats.nTotalModule=nNumbersOfGithub;
+    currentStats.nTotalModule = nNumbersOfGithub;
 
-    for(int i=0;(i<nCount)&&(!bIsStop);i++)
-    {
-        Utils::MDATA mdata=listMData.at(i);
+    for (int i = 0; (i < nCount) && (!bIsStop); i++) {
+        Utils::MDATA mdata = listMData.at(i);
 
-        if(mdata.sGithub!="")
-        {
-            QString sGithub=mdata.sGithub;
-            sGithub=sGithub.section("github.com/",1,1);
+        if (mdata.sGithub != "") {
+#ifdef QT_DEBUG
+            qDebug("Guthub %s", mdata.sGithub.toLatin1().data());
+#endif
 
-            QString sUserName=sGithub.section("/",0,0);
-            QString sRepoName=sGithub.section("/",1,1);
+            QString sGithub = mdata.sGithub;
+            sGithub = sGithub.section("github.com/", 1, 1);
 
-            XGithub github(sUserName,sRepoName);
+            QString sUserName = sGithub.section("/", 0, 0);
+            QString sRepoName = sGithub.section("/", 1, 1);
+
+            XGithub github(sUserName, sRepoName);
             github.setCredentials(sAuthUser, sAuthToken);
 
-            connect(&github,SIGNAL(errorMessage(QString)),this,SIGNAL(errorMessage(QString)));
+            connect(&github, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
 
-            XGithub::RELEASE_HEADER release=github.getLatestRelease(true);
+            XGithub::RELEASE_HEADER release = github.getLatestRelease(true);
 
-            if(release.bValid)
-            {
-                mdata.sDate=release.dt.toString("yyyy-MM-dd"); // rewrite
+            if (release.bValid) {
+                mdata.sDate = release.dt.toString("yyyy-MM-dd");  // rewrite
 
-                if(release.sTag!="")
-                {
-                    mdata.sVersion=release.sTag;
-                }
-                else
-                {
-                    mdata.sVersion=release.sName;
+                if (release.sTag != "") {
+                    mdata.sVersion = release.sTag;
+                } else {
+                    mdata.sVersion = release.sName;
                 }
 
-                int nNumberOfAsserts=release.listRecords.count();
+                int nNumberOfAsserts = release.listRecords.count();
 
                 QSet<QString> stDownloads;
 
-                for(int j=0;j<nNumberOfAsserts;j++)
-                {
-                    if(Utils::checkPattern(release.listRecords.at(j).sSrc,&mdata))
-                    {
+                for (int j = 0; j < nNumberOfAsserts; j++) {
+                    if (Utils::checkPattern(release.listRecords.at(j).sSrc, &mdata)) {
                         stDownloads.insert(release.listRecords.at(j).sSrc);
                     }
                 }
 
-                QList<QString> listStrings=XGithub::getDownloadLinks(release.sBody);
+                QList<QString> listStrings = XGithub::getDownloadLinks(release.sBody);
 
-                int nNumberOfLinks=listStrings.count();
+                int nNumberOfLinks = listStrings.count();
 
-                for(int j=0;j<nNumberOfLinks;j++)
-                {
-                    if(Utils::checkPattern(listStrings.at(j),&mdata))
-                    {
+                for (int j = 0; j < nNumberOfLinks; j++) {
+                    if (Utils::checkPattern(listStrings.at(j), &mdata)) {
                         stDownloads.insert(listStrings.at(j));
                     }
                 }
 
-                mdata.listDownloads=stDownloads.toList();
+                mdata.listDownloads = stDownloads.toList();
 
-                Utils::updateJsonFile(sServerListFileName,QList<Utils::MDATA>() << mdata);
+                Utils::updateJsonFile(sServerLastestListFileName, QList<Utils::MDATA>() << mdata);
             }
-            else
-            {
+
+            if (release.bNetworkError) {
+#ifdef QT_DEBUG
+                qDebug("Broken %s", mdata.sGithub.toLatin1().data());
+#endif
                 break;
             }
         }
 
-        currentStats.nCurrentModule=i+1;
+        currentStats.nCurrentModule = i + 1;
     }
 
     emit completed(elapsedTimer.elapsed());

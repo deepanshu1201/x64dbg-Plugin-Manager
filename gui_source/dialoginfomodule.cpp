@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,11 +19,10 @@
 // SOFTWARE.
 //
 #include "dialoginfomodule.h"
+
 #include "ui_dialoginfomodule.h"
 
-DialogInfoModule::DialogInfoModule(QWidget *pParent,Utils::MDATA *pMData) :
-    QDialog(pParent),
-    ui(new Ui::DialogInfoModule)
+DialogInfoModule::DialogInfoModule(QWidget *pParent, Utils::MDATA *pMData) : QDialog(pParent), ui(new Ui::DialogInfoModule)
 {
     ui->setupUi(this);
 

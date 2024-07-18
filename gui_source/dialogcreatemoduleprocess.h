@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #include <QDialog>
 #include <QThread>
 #include <QTimer>
+
 #include "../createmoduleprocess.h"
 #include "../utils.h"
 
@@ -31,12 +32,11 @@ namespace Ui {
 class DialogCreateModuleProcess;
 }
 
-class DialogCreateModuleProcess : public QDialog
-{
+class DialogCreateModuleProcess : public QDialog {
     Q_OBJECT
 
 public:
-    explicit DialogCreateModuleProcess(QWidget *pParent, Utils::MDATA *pMData,bool bCreateInfoFile);
+    explicit DialogCreateModuleProcess(QWidget *pParent, Utils::MDATA *pMData, bool bCreateInfoFile);
     ~DialogCreateModuleProcess();
 
 private slots:
@@ -54,7 +54,8 @@ private:
     CreateModuleProcess *pCreateModuleProcess;
     QThread *pThread;
     bool bIsRun;
+    XBinary::PDSTRUCT g_pdStructEmpty;
     QTimer *pTimer;
 };
 
-#endif // DIALOGCREATEMODULEPROCESS_H
+#endif  // DIALOGCREATEMODULEPROCESS_H

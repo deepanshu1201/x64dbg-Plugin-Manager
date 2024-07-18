@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,18 @@
 #define DIALOGINSTALLMODULE_H
 
 #include <QDialog>
-#include "dialoginstallmoduleprocess.h"
+
+#include "../utils.h"
 #include "dialogconvertprocess.h"
 #include "dialogcreatemoduleprocess.h"
 #include "dialoggetfilefromserverprocess.h"
-#include "../utils.h"
+#include "dialoginstallmoduleprocess.h"
 
 namespace Ui {
 class DialogInstallModule;
 }
 
-class DialogInstallModule : public QDialog
-{
+class DialogInstallModule : public QDialog {
     Q_OBJECT
 
 public:
@@ -58,4 +58,4 @@ private:
     QString sModuleFileName;
 };
 
-#endif // DIALOGINSTALLMODULE_H
+#endif  // DIALOGINSTALLMODULE_H

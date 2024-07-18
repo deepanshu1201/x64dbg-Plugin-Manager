@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,16 @@
 
 ConsoleOutput::ConsoleOutput(QObject *pParent) : QObject(pParent)
 {
-
 }
 
 void ConsoleOutput::infoMessage(QString sText)
 {
-    QString _sText=sText;
-    printf("%s\n",_sText.toLatin1().data());
+    QString _sText = sText;
+    printf("%s\n", _sText.toLatin1().data());
 }
 
 void ConsoleOutput::errorMessage(QString sText)
 {
-    QString _sText=sText;
-    printf("Error: %s\n",_sText.toLatin1().data());
+    QString _sText = sText;
+    printf("Error: %s\n", _sText.toLatin1().data());
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,44 +19,44 @@
 // SOFTWARE.
 //
 #include "dialogconvertprocess.h"
+
 #include "ui_dialogconvertprocess.h"
 
-DialogConvertProcess::DialogConvertProcess(QWidget *pParent, Utils::MDATA *pMData, QString sDataPath) :
-    QDialog(pParent),
-    ui(new Ui::DialogConvertProcess)
+DialogConvertProcess::DialogConvertProcess(QWidget *pParent, Utils::MDATA *pMData, QString sDataPath) : QDialog(pParent), ui(new Ui::DialogConvertProcess)
 {
     ui->setupUi(this);
 
-    this->pMData=pMData;
-    this->sDataPath=sDataPath;
+    this->pMData = pMData;
+    this->sDataPath = sDataPath;
 
-    pConvertProcess=new ConvertProcess;
-    pThread=new QThread;
+    pConvertProcess = new ConvertProcess;
+    pThread = new QThread;
 
     pConvertProcess->moveToThread(pThread);
 
     connect(pThread, SIGNAL(started()), pConvertProcess, SLOT(process()));
     connect(pConvertProcess, SIGNAL(completed(qint64)), this, SLOT(onCompleted(qint64)));
-    connect(pConvertProcess,SIGNAL(errorMessage(QString)),this,SIGNAL(errorMessage(QString)));
+    connect(pConvertProcess, SIGNAL(errorMessage(QString)), this, SIGNAL(errorMessage(QString)));
 
-    pTimer=new QTimer(this);
+    pTimer = new QTimer(this);
     connect(pTimer, SIGNAL(timeout()), this, SLOT(timerSlot()));
 
-    pConvertProcess->setData(pMData,sDataPath);
+    g_pdStructEmpty = XBinary::createPdStruct();
 
-    bIsRun=true;
+    pConvertProcess->setData(pMData, sDataPath, &g_pdStructEmpty);
+
+    bIsRun = true;
 
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(0);
 
     pThread->start();
-    pTimer->start(100); // 0.1 sec
+    pTimer->start(100);  // 0.1 sec
 }
 
 DialogConvertProcess::~DialogConvertProcess()
 {
-    if(bIsRun)
-    {
+    if (bIsRun) {
         pConvertProcess->stop();
     }
 
@@ -73,11 +73,10 @@ DialogConvertProcess::~DialogConvertProcess()
 
 void DialogConvertProcess::on_pushButtonCancel_clicked()
 {
-    if(bIsRun)
-    {
+    if (bIsRun) {
         pConvertProcess->stop();
         pTimer->stop();
-        bIsRun=false;
+        bIsRun = false;
     }
 }
 
@@ -85,18 +84,17 @@ void DialogConvertProcess::onCompleted(qint64 nElapsed)
 {
     Q_UNUSED(nElapsed)
     // TODO
-    bIsRun=false;
+    bIsRun = false;
     this->close();
 }
 
 void DialogConvertProcess::timerSlot()
 {
-    Utils::STATS stats=pConvertProcess->getCurrentStats();
+    Utils::STATS stats = pConvertProcess->getCurrentStats();
 
     ui->labelInfo->setText(stats.sModule);
 
-    if(stats.nTotalModule)
-    {
-        ui->progressBar->setValue((int)((stats.nCurrentModule*100)/stats.nTotalModule));
+    if (stats.nTotalModule) {
+        ui->progressBar->setValue((int)((stats.nCurrentModule * 100) / stats.nTotalModule));
     }
 }

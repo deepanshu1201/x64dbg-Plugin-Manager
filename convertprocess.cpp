@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,20 @@
 
 ConvertProcess::ConvertProcess(QObject *pParent) : QObject(pParent)
 {
-    bIsStop=false;
-    currentStats={};
+    currentStats = {};
+    g_pPdStruct = nullptr;
 }
 
-void ConvertProcess::setData(Utils::MDATA *pMData, QString sDataPath)
+void ConvertProcess::setData(Utils::MDATA *pMData, QString sDataPath, XBinary::PDSTRUCT *pPdStruct)
 {
-    this->pMData=pMData;
-    this->sDataPath=XBinary::convertPathName(sDataPath);
+    this->pMData = pMData;
+    this->sDataPath = XBinary::convertPathName(sDataPath);
+    this->g_pPdStruct = pPdStruct;
 }
 
 void ConvertProcess::stop()
 {
-    bIsStop=true;
+    g_pPdStruct->bIsStop = true;
 }
 
 Utils::STATS ConvertProcess::getCurrentStats()
@@ -47,53 +48,40 @@ void ConvertProcess::process()
     QElapsedTimer elapsedTimer;
     elapsedTimer.start();
 
-    bIsStop=false;
+    QString sGithubZipModulePath = Utils::getConvertModulePath(sDataPath, pMData->sName);
 
-    QString sGithubZipModulePath=Utils::getConvertModulePath(sDataPath,pMData->sName);
+    currentStats.nTotalModule = pMData->listConvertRecords.count();
 
-    currentStats.nTotalModule=pMData->listConvertRecords.count();
+    for (int i = 0; (i < currentStats.nTotalModule) && (!(g_pPdStruct->bIsStop)); i++) {
+        Utils::HANDLE_RECORD handleRecord = pMData->listConvertRecords.at(i);
 
-    for(int i=0;(i<currentStats.nTotalModule)&&(!bIsStop);i++)
-    {
-        Utils::HANDLE_RECORD handleRecord=pMData->listConvertRecords.at(i);
-
-        QString sFileName=Utils::getConvertDownloadFileName(sDataPath,pMData->sName,handleRecord.sPattern);
-        QString sPath=sGithubZipModulePath+QDir::separator()+handleRecord.sPath;
+        QString sFileName = Utils::getConvertDownloadFileName(sDataPath, pMData->sName, handleRecord.sPattern);
+        QString sPath = sGithubZipModulePath + QDir::separator() + handleRecord.sPath;
 
         XZip zip;
 
         // TODO errors
-        if(handleRecord.action==Utils::ACTION_MAKEDIRECTORY)
-        {
+        if (handleRecord.action == Utils::ACTION_MAKEDIRECTORY) {
             XBinary::createDirectory(sPath);
-        }
-        else if(handleRecord.action==Utils::ACTION_COPYFILE)
-        {
-            if(sFileName!="")
-            {
+        } else if (handleRecord.action == Utils::ACTION_COPYFILE) {
+            if (sFileName != "") {
                 XBinary::createDirectory(QFileInfo(sPath).absolutePath());
-                XBinary::copyFile(sFileName,sPath);
+                XBinary::copyFile(sFileName, sPath);
             }
             // TODO errors
-        }
-        else if(handleRecord.action==Utils::ACTION_UNPACKFILE)
-        {
-            if(sFileName!="")
-            {
-                zip.decompressToFile(sFileName,handleRecord.sSrc,sPath);
+        } else if (handleRecord.action == Utils::ACTION_UNPACKFILE) {
+            if (sFileName != "") {
+                zip.decompressToFile(sFileName, handleRecord.sSrc, sPath, g_pPdStruct);
             }
             // TODO errors
-        }
-        else if(handleRecord.action==Utils::ACTION_UNPACKDIRECTORY)
-        {
-            if(sFileName!="")
-            {
-                zip.decompressToPath(sFileName,handleRecord.sSrc,sPath);
+        } else if (handleRecord.action == Utils::ACTION_UNPACKDIRECTORY) {
+            if (sFileName != "") {
+                zip.decompressToPath(sFileName, handleRecord.sSrc, sPath, g_pPdStruct);
             }
             // TODO errors
         }
 
-        currentStats.nCurrentModule=i;
+        currentStats.nCurrentModule = i;
     }
 
     emit completed(elapsedTimer.elapsed());

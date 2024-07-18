@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,17 @@
 #ifndef CONVERTPROCESS_H
 #define CONVERTPROCESS_H
 
-#include <QObject>
 #include <QElapsedTimer>
+#include <QObject>
+
 #include "utils.h"
 #include "xzip.h"
 
-class ConvertProcess : public QObject
-{
+class ConvertProcess : public QObject {
     Q_OBJECT
 public:
-    explicit ConvertProcess(QObject *pParent=nullptr);
-    void setData(Utils::MDATA *pMData,QString sDataPath);
+    explicit ConvertProcess(QObject *pParent = nullptr);
+    void setData(Utils::MDATA *pMData, QString sDataPath, XBinary::PDSTRUCT *pPdStruct);
     void stop();
     Utils::STATS getCurrentStats();
 
@@ -45,9 +45,9 @@ public slots:
 
 private:
     Utils::MDATA *pMData;
-    bool bIsStop;
     Utils::STATS currentStats;
     QString sDataPath;
+    XBinary::PDSTRUCT *g_pPdStruct;
 };
 
-#endif // CONVERTPROCESS_H
+#endif  // CONVERTPROCESS_H

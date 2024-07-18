@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2024 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,19 +21,19 @@
 #ifndef UPDATEGITPROCESS_H
 #define UPDATEGITPROCESS_H
 
-#include <QObject>
 #include <QElapsedTimer>
+#include <QObject>
 #include <QThread>
+
 #include "utils.h"
 #include "xgithub.h"
 
-class UpdateGitProcess : public QObject
-{
+class UpdateGitProcess : public QObject {
     Q_OBJECT
 
 public:
-    explicit UpdateGitProcess(QObject *pParent=nullptr);
-    void setData(QString sServerListFileName);
+    explicit UpdateGitProcess(QObject *pParent = nullptr);
+    void setData(QString sServerListFileName, QString sServerLastestListFileName, bool bInit);
     void stop();
     Utils::STATS getCurrentStats();
     void setCredentials(QString sUser, QString sToken);
@@ -48,10 +48,12 @@ public slots:
 
 private:
     QString sServerListFileName;
+    QString sServerLastestListFileName;
     bool bIsStop;
     Utils::STATS currentStats;
     QString sAuthUser;
     QString sAuthToken;
+    bool g_bInit;
 };
 
-#endif // UPDATEGITPROCESS_H
+#endif  // UPDATEGITPROCESS_H

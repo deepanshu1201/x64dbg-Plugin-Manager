@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,21 @@
 #ifndef DIALOGABOUT_H
 #define DIALOGABOUT_H
 
-#include <QDialog>
 #include <QDate>
+#include <QDialog>
+
 #include "../global.h"
+#include "xoptions.h"
 
 namespace Ui {
 class DialogAbout;
 }
 
-class DialogAbout : public QDialog
-{
+class DialogAbout : public QDialog {
     Q_OBJECT
 
 public:
-    explicit DialogAbout(QWidget *pParent=nullptr);
+    explicit DialogAbout(QWidget *pParent = nullptr);
     ~DialogAbout();
 
 private slots:
@@ -44,4 +45,4 @@ private:
     Ui::DialogAbout *ui;
 };
 
-#endif // DIALOGABOUT_H
+#endif  // DIALOGABOUT_H

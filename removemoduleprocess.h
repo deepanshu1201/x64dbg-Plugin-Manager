@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,16 @@
 #ifndef REMOVEMODULEPROCESS_H
 #define REMOVEMODULEPROCESS_H
 
-#include <QObject>
 #include <QElapsedTimer>
+#include <QObject>
+
 #include "utils.h"
 
-class RemoveModuleProcess : public QObject
-{
+class RemoveModuleProcess : public QObject {
     Q_OBJECT
 
 public:
-    explicit RemoveModuleProcess(QObject *pParent=nullptr);
+    explicit RemoveModuleProcess(QObject *pParent = nullptr);
     void setData(QString sDataPath, QString sRootPath, QList<QString> listModuleNames);
     void stop();
     Utils::STATS getCurrentStats();
@@ -51,4 +51,4 @@ private:
     Utils::STATS currentStats;
 };
 
-#endif // REMOVEMODULEPROCESS_H
+#endif  // REMOVEMODULEPROCESS_H

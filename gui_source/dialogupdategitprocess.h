@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #include <QDialog>
 #include <QThread>
 #include <QTimer>
+
 #include "../updategitprocess.h"
 #include "../utils.h"
 
@@ -31,12 +32,11 @@ namespace Ui {
 class DialogUpdateGitProcess;
 }
 
-class DialogUpdateGitProcess : public QDialog
-{
+class DialogUpdateGitProcess : public QDialog {
     Q_OBJECT
 
 public:
-    explicit DialogUpdateGitProcess(QWidget *pParent, QString sDataPath);
+    explicit DialogUpdateGitProcess(QWidget *pParent, QString sServerListFileName, QString sServerLastestListFileName, bool bInit);
     ~DialogUpdateGitProcess();
 
 private slots:
@@ -49,11 +49,11 @@ signals:
 
 private:
     Ui::DialogUpdateGitProcess *ui;
-    QString sDataPath;
+    QString sServerLastestListFileName;
     UpdateGitProcess *pUpdateGitProcess;
     QThread *pThread;
     bool bIsRun;
     QTimer *pTimer;
 };
 
-#endif // DIALOGUPDATEGITPROCESS_H
+#endif  // DIALOGUPDATEGITPROCESS_H

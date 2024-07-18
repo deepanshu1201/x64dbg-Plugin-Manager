@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2022 hors<horsicq@gmail.com>
+// Copyright (c) 2019-2023 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,17 @@
 #define DIALOGINFOMODULE_H
 
 #include <QDialog>
+
 #include "../utils.h"
 
 namespace Ui {
 class DialogInfoModule;
 }
 
-class DialogInfoModule : public QDialog
-{
+class DialogInfoModule : public QDialog {
     Q_OBJECT
 
-public:    
+public:
     explicit DialogInfoModule(QWidget *pParent, Utils::MDATA *pMData);
     ~DialogInfoModule();
 
@@ -43,4 +43,4 @@ private:
     Ui::DialogInfoModule *ui;
 };
 
-#endif // DIALOGINFOMODULE_H
+#endif  // DIALOGINFOMODULE_H
